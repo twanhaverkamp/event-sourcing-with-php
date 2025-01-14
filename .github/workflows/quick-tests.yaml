@@ -48,8 +48,9 @@ jobs:
         uses: php-actions/composer@v6
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit --testsuite=unit --testdox --coverage-text --colors
+        uses: php-actions/phpunit@v4
         env:
           XDEBUG_MODE: coverage
         with:
           php_extensions: xdebug
+          testsuite: unit
