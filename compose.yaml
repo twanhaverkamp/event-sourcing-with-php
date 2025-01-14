@@ -1,0 +1,10 @@
+services:
+  php-8.3:
+    image: php:8.3-alpine
+    entrypoint: ['sh', 'entrypoint.sh']
+    environment:
+      XDEBUG_CONFIG: 'client_host=host.docker.internal'
+      XDEBUG_MODE: 'coverage,debug'
+    volumes:
+      - ./:/var/www/event-sourcing-with-php
+    working_dir: /var/www/event-sourcing-with-php
