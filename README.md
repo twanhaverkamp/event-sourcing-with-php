@@ -1,22 +1,22 @@
 # Event Sourcing with PHP
 
-## Table of Contents
+**Table of Contents**
 
-- What problem does Event Sourcing solve for you?
+- [What problem does Event Sourcing solve for you?](#what-problem-does-event-sourcing-solve-for-you)
     - [Drawbacks](#drawbacks)
     - [Considerations](#considerations)
 
-- Components
+- [Components](#components)
     - [Aggregate](#aggregate)
     - [AggregateRootId](#aggregaterootid)
     - [Event](#event)
     - [EventStore](#eventstore)
 
-- Usage
+- [Usage](#usage)
     - [Installation](#installation)
     - [Implementation](#implementation)
 
-- Contribute
+- [Contribute](#contribute)
     - [Fork](#fork)
     - [Run the project locally](#run-the-project-locally)
     - [Testing](#testing)
