@@ -1,5 +1,28 @@
 # Event Sourcing with PHP
 
+## Table of Contents
+
+- What problem does Event Sourcing solve for you?
+    - [Drawbacks](#drawbacks)
+    - [Considerations](#considerations)
+
+- Components
+    - [Aggregate](#aggregate)
+    - [AggregateRootId](#aggregaterootid)
+    - [Event](#event)
+    - [EventStore](#eventstore)
+
+- Usage
+    - [Installation](#installation)
+    - [Implementation](#implementation)
+
+- Contribute
+    - [Fork](#fork)
+    - [Run the project locally](#run-the-project-locally)
+    - [Testing](#testing)
+    - [Pull request](#pull-request)
+    - [Update your LinkedIn profile](#update-your-linkedin-profile)
+
 ## What problem does Event Sourcing solve for you?
 You not only want to know what the current state of an object is, but you also want to know
 *how* the object got in this state? In that case Event Sourcing might be the solution
@@ -11,6 +34,7 @@ While Event Sourcing may solve problems, it also brings some challenges with it:
 - Learning curve; *When shifting from CRUD to Event Sourcing, you may experience a steep learning curve.*
 - Potentially slow; *Especially when your aggregate has a long life cycle.*
 
+<a href="#considerations"></a>
 ### Considerations
 Since this is supposed to be a *lightweight* library you will have to come up (for now) with a solution
 for the following:
@@ -20,24 +44,6 @@ for the following:
 - [ ] Anonymize; *Protect (privacy) sensitive data.*
 
 > Yes, I'm planning to implement these features **soon™**, but until then it's up to you. 😅
-
-## Usage
-
-### Installation
-
-**Requirements:**
-- PHP 8.3 (or higher)
-
-If you're using [Composer](https://getcomposer.org/) in your project you can run the following command:
-
-```shell
-composer require twanhaverkamp/event-sourcing-with-php:^1.0 
-```
-
-### Implementation
-To understand how to implement this library in your project I would encourage you to take a look at
-the [/example](/example) directory and specifically the [Invoice](/example/Aggregate/Invoice.php) class
-as it represents an aggregate containing both business logic and the usage of events.
 
 ## Components
 
@@ -58,7 +64,25 @@ As an Event took place in the past, it's considered good practice to reflect thi
 ### EventStore
 The [EventStore](/src/Event/EventStore/EventStoreInterface.php) is an interesting one. Instead of fetching an Aggregate
 directly from your storage you query it's related Events with the AggregateRootId sorted by their "recordedAt" value
-in ascending order. Each Event will be applied to the Aggregate, which eventually will get in it's expected state. 
+in ascending order. Each Event will be applied to the Aggregate, which eventually will get in it's expected state.
+
+## Usage
+
+### Installation
+
+**Requirements:**
+- PHP 8.3 (or higher)
+
+If you're using [Composer](https://getcomposer.org/) in your project you can run the following command:
+
+```shell
+composer require twanhaverkamp/event-sourcing-with-php:^1.0 
+```
+
+### Implementation
+To understand how to implement this library in your project I would encourage you to take a look at
+the [/example](/example) directory and specifically the [Invoice](/example/Aggregate/Invoice.php) class
+as it represents an aggregate containing both business logic and the usage of events.
 
 ## Contribute
 You've found a bug or want to introduce a new feature? Awesome! 🤩
@@ -110,5 +134,5 @@ If all checks pass ✅ you can create a pull request targeting this repository's
 I'll review it as **soon™** as possible, I'll promise! 🤝🏻
 
 ### Update your LinkedIn profile
-Now you're officially an *open-source software contributor*, thank you! ❤️
+Now you're officially an *open-source software contributor*, thank you! ❤️  
 Time to update your [LinkedIn](https://linkedin.com/) profile! 🏆
