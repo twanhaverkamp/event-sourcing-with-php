@@ -53,7 +53,7 @@ and is created before the Aggregate is being stored.
 An [Event](/src/Event/EventInterface.php) changed one or multiple properties of your Aggregate. New property values
 are "stored" in its payload and will be re-applied when the Aggregate is being rebuilt from storage.
 
-As an Event took place in the past and therefor it's good practice to reflect this when naming your Event.
+As an Event took place in the past, it's considered good practice to reflect this when naming your Events.
 
 ### EventStore
 The [EventStore](/src/Event/EventStore/EventStoreInterface.php) is an interesting one. Instead of fetching an Aggregate
@@ -61,7 +61,7 @@ directly from your storage you query it's related Events with the AggregateRootI
 in ascending order. Each Event will be applied to the Aggregate, which eventually will get in it's expected state. 
 
 ## Contribute
-You found a bug or want to introduce a new feature? Awesome! 🤩
+You've found a bug or want to introduce a new feature? Awesome! 🤩
 
 ### Fork
 Create a fork by clicking [this link](https://github.com/twanhaverkamp/event-sourcing-with-php/fork) and follow 
@@ -110,5 +110,5 @@ If all checks pass ✅ you can create a pull request targeting this repository's
 I'll review it as **soon™** as possible, I'll promise! 🤝🏻
 
 ### Update your LinkedIn profile
-Now you officially are an open-source software contributor, thank you! ❤️
+Now you're officially an *open-source software contributor*, thank you! ❤️
 Time to update your [LinkedIn](https://linkedin.com/) profile! 🏆
