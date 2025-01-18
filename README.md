@@ -205,7 +205,7 @@ readonly class InvoiceWasCreated extends Event\AbstractEvent
 ```
 
 > The `getPayload` and `fromPayload` methods are used by the EventStore to store- and load an Event.
-> An Event supposed to be immutable and therefor should be *readonly*. 
+> An Event is supposed to be immutable and therefore should be *readonly*. 
 
 #### Record Events with your Aggregate
 Add an `apply[event-name]` method for every Event and replace your domain logic with a `recordThat` call.
