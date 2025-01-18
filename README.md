@@ -289,14 +289,16 @@ $invoice = Invoice::create('12-34',
     new DTO\Item(null, 'Shipping', 1, 4.95, 0.),
 );
 
-$paymentTransaction = $invoice->startPaymentTransaction('Manual', 10.);
+$invoice->startPaymentTransaction('Manual', 10.);
 
 // ...
 
 /** @var EventStore\EventStoreInterface $eventStore */
 $eventStore = // ...
 
-$eventStore->save($aggregate);
+// $invoice->aggregateRootId = AggregateRootId\Uuid7<'01941d8f-9951-72af-b5ce-5aa7aa23ea68'>
+
+$eventStore->save($invoice);
 
 // ...
 ```
@@ -319,7 +321,16 @@ $invoice = Invoice::init('01941d8f-9951-72af-b5ce-5aa7aa23ea68');
 /** @var EventStore\EventStoreInterface $eventStore */
 $eventStore = // ...
 
-$eventStore->load($aggregate);
+$eventStore->load($invoice);
+
+// $invoice->number = '12-34'
+// $invoice->items = [
+//     DTO\Item(reference: 'prod.123.456', description: 'Product', quantity: 3, price: 5.95, tax: 21.),
+//     DTO\Item(description: 'Shipping', quantity: 1, price: 4.95, tax: 0.),
+// ]
+// $invoice->paymentTransactions = [
+//     DTO\PaymentTransaction(paymentMethod: 'Manual', amount: 10., status: 'started'),
+// ]
 
 // ...
 ```
