@@ -22,12 +22,12 @@ class Invoice extends Aggregate\AbstractAggregate
      */
     public array $items;
 
-    public DateTimeInterface $createdAt;
-
     /**
      * @var array<string<RamseyUuid\UuidInterface>, DTO\PaymentTransaction>
      */
     public array $paymentTransactions;
+
+    public DateTimeInterface $createdAt;
 
     public static function init(string $aggregateRootId): self
     {
