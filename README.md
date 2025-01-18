@@ -15,6 +15,11 @@
 - [Usage](#usage)
     - [Installation](#installation)
     - [Implementation](#implementation)
+      - [Create an Aggregate class](#create-an-aggregate-class)
+      - [Create your Event classes](#create-your-event-classes)
+      - [Record Events with your Aggregate](#record-events-with-your-aggregate)
+      - [Store the Aggregate](#save-the-aggregate)
+      - [Load the Aggregate](#load-the-aggregate)
 
 - [Contribute](#contribute)
     - [Fork](#fork)
@@ -52,8 +57,11 @@ The [Aggregate](/src/Aggregate/AggregateInterface.php) encapsulates business log
 your domain.
 
 ### AggregateRootId
-The [AggregateRootId](/src/Aggregate/AggregateRootId/AggregateRootIdInterface.php) is the Aggregate's unique identifier
-and is created before the Aggregate is being stored.
+The [AggregateRootId](/src/Aggregate/AggregateRootId/AggregateRootIdInterface.php) is the Aggregate's unique identifier,
+which is instantiated before the Aggregate is being created.
+
+**Available:**
+- [UUID v7](/src/Aggregate/AggregateRootId/Uuid7.php); *wraps the [ramsey/uuid](https://uuid.ramsey.dev/) library.*
 
 ### Event
 An [Event](/src/Event/EventInterface.php) changed one or multiple properties of your Aggregate. New property values
@@ -84,6 +92,238 @@ To understand how to implement this library in your project I would encourage yo
 the [/example](/example) directory and specifically the [Invoice](/example/Aggregate/Invoice.php) class
 as it represents an aggregate containing both business logic and the usage of events.
 
+> You'll see some `// ...` in the code snippets. It indicates there's more code, but it's not relevant
+> for the given example.
+
+#### Create an Aggregate class
+Add public methods for your business logic, where their names reflect your domain.
+
+```php
+<?php
+
+// ...
+
+use DateTimeImmutable;
+use DateTimeInterface;
+use TwanHaverkamp\EventSourcingWithPhp\Aggregate;
+use TwanHaverkamp\EventSourcingWithPhp\Aggregate\AggregateRootId;
+use TwanHaverkamp\EventSourcingWithPhp\Event;
+
+class Invoice extends Aggregate\AbstractAggregate
+{
+    public string $number;
+
+    /**
+     * @var DTO\Item[]
+     */
+    public array $items;
+
+    /**
+     * @var DTO\PaymentTransaction[]
+     */
+    public array $paymentTransactions;
+
+    public DateTimeInterface $createdAt;
+
+    public static function init(string $aggregateRootId): self
+    {
+        return new self(
+            AggregateRootId\Uuid7::fromString($aggregateRootId),
+        );
+    }
+
+    public static function create(string $number, DTO\Item ...$items): self
+    {
+        $invoice = new self($aggregateRootId = new AggregateRootId\Uuid7());
+        $this->number    = $event->number;
+        $this->items     = $event->items;
+        $this->createdAt = new DateTimeImmutable();
+
+        return $invoice;
+    }
+
+    public function startPaymentTransaction(string $paymentMethod, float $amount): DTO\PaymentTransaction
+    {
+        // ...
+    }
+
+    // ...
+}
+```
+
+> I would recommend you to add a *static* `init` method that expects a string value as AggregateRootId. This method
+> returns an empty Aggregate with the correct AggregateRootId instance type that you can use to pass to an EventStore’s
+> `load` function.
+
+#### Create your Event classes
+For every method that affects the Aggregate you create an Event class.
+
+```php
+<?php
+
+// ...
+
+use DateTimeInterface;
+use TwanHaverkamp\EventSourcingWithPhp\Aggregate\AggregateRootId;
+use TwanHaverkamp\EventSourcingWithPhp\Event;
+
+readonly class InvoiceWasCreated extends Event\AbstractEvent
+{
+    /**
+     * @param DTO\Item[] $items
+     */
+    public function __construct(
+        AggregateRootId\AggregateRootIdInterface $aggregateRootId,
+        public string $number,
+        public array $items,
+        public DateTimeInterface $createdAt,
+    ) {
+        parent::__construct($aggregateRootId, $createdAt);
+    }
+
+    public static function fromPayload(
+        AggregateRootId\AggregateRootIdInterface $aggregateRootId,
+        array $payload,
+        DateTimeInterface $recordedAt,
+    ): self {
+        return new self(
+            $aggregateRootId,
+            (string)$payload['number'],
+            array_map(fn (array $item) => DTO\Item::fromArray($item), $payload['items']),
+            $recordedAt,
+        );
+    }
+
+    public function getPayload(): array
+    {
+        return [
+            'number' => $this->number,
+            'items'  => array_map(fn (DTO\Item $item) => $item->toArray(), $this->items),
+        ];
+    }
+}
+```
+
+> The `getPayload` and `fromPayload` methods are used by the EventStore to store- and load an Event.
+> An Event supposed to be immutable and therefor should be *readonly*. 
+
+#### Record Events with your Aggregate
+Add an `apply[event-name]` method for every Event and replace your domain logic with a `recordThat` call.
+Move the domain logic to its designated `apply[event-name]` method.
+
+```php
+<?php
+
+use DateTimeImmutable;
+use TwanHaverkamp\EventSourcingWithPhp\Aggregate;
+use TwanHaverkamp\EventSourcingWithPhp\Aggregate\AggregateRootId;
+use TwanHaverkamp\EventSourcingWithPhp\Event;
+use TwanHaverkamp\EventSourcingWithPhp\Event\Exception;
+
+class Invoice extends Aggregate\AbstractAggregate
+{
+    // ...
+
+    public static function create(string $number, DTO\Item ...$items): self
+    {
+        $invoice = new self($aggregateRootId = new AggregateRootId\Uuid7());
+        $invoice->recordThat(new InvoiceWasCreated(
+            $aggregateRootId,
+            $number,
+            $items,
+            new DateTimeImmutable()
+        ));
+
+        return $invoice;
+    }
+
+    // ...
+
+    public function apply(Event\EventInterface $event): void
+    {
+        match ($event::class) {
+            InvoiceWasCreated::class => $this->applyInvoiceWasCreated($event),
+            // ...
+            default => throw new Exception\EventNotSupportedException(
+                message: sprintf(
+                    'Event "%s" is not supported by "%s" aggregate.',
+                    $event::class,
+                    $this::class,
+                ),
+            ),
+        };
+    }
+
+    // ...
+
+    private function applyInvoiceWasCreated(InvoiceWasCreated $event): void
+    {
+        $this->number    = $event->number;
+        $this->items     = $event->items;
+        $this->createdAt = clone $event->createdAt;
+    }
+
+    // ...
+}
+```
+
+> The `recordThat` method is part of the [AbstractAggregate](/src/Aggregate/AbstractAggregate.php) class and requires
+> you to add an `apply` method that receives an Event as argument. With a *match* you can map each Event to the correct
+> `apply[event-name]` method.
+
+#### Save the Aggregate
+This requires you to create your own EventStore that implements
+the [EventStoreInterface](/src/Event/EventStore/EventStoreInterface.php).
+
+```php
+<?php
+
+// ...
+
+use TwanHaverkamp\EventSourcingWithPhp\Event\EventStore;
+
+// ...
+
+$invoice = Invoice::create('12-34',
+    new DTO\Item('prod.123.456', 'Product', 3, 5.95, 21.),
+    new DTO\Item(null, 'Shipping', 1, 4.95, 0.),
+);
+
+$paymentTransaction = $invoice->startPaymentTransaction('Manual', 10.);
+
+// ...
+
+/** @var EventStore\EventStoreInterface $eventStore */
+$eventStore = // ...
+
+$eventStore->save($aggregate);
+
+// ...
+```
+
+#### Load the Aggregate
+When loading an Aggregate its Events are applied one-by-one by the EventStore based on the related AggregateRootId
+sorted by `recordedAt` in ascending order.
+
+```php
+<?php
+
+// ...
+
+use TwanHaverkamp\EventSourcingWithPhp\Event\EventStore;
+
+// ...
+
+$invoice = Invoice::init('01941d8f-9951-72af-b5ce-5aa7aa23ea68');
+
+/** @var EventStore\EventStoreInterface $eventStore */
+$eventStore = // ...
+
+$eventStore->load($aggregate);
+
+// ...
+```
+
 ## Contribute
 You've found a bug or want to introduce a new feature? Awesome! 🤩
 
@@ -96,28 +336,47 @@ Now you have the project copied into a new repository on your own [GitHub](https
 > At this point I'm assuming you have a GitHub account.
 
 ### Run the project locally
-After cloning the repository onto your computer you can run the project in [Docker](https://www.docker.com/) with
-the following command:
 
 ```shell
-# Start the project:
+# Navigate to your working directory
+cd ../[your-working-directory]
+
+# Clone the project from Github
+git clone git@github.com:[your-github-username]/event-sourcing-with-php.git
+
+# Navigate to the project directory
+cd event-sourcing-with-php/
+
+# Start Docker Compose
 docker compose up -d
 ```
+
+If you want to get into the project's PHP container, run the following command:
+
 ```shell
-# Shell into the PHP container:
 docker compose exec -it php-8.3 sh
 ```
 
-> This requires you to have Docker installed on your computer. Personally I'm using
+> This requires you to have [Docker](https://www.docker.com/) installed on your computer. Personally I'm using
 > [Docker Desktop](https://www.docker.com/products/docker-desktop/), but there are other alternatives like
-> [Rancher Desktop](https://rancherdesktop.io/) out there as well, that's totally up to you.
+> [Rancher Desktop](https://rancherdesktop.io/) out there as well, it's totally up to you.
 
 ### Testing
 When you've fixed a bug or introduced a new feature you cover it with [PHPUnit](https://docs.phpunit.de/en/11.5/) tests
 to make sure code quality won't decrease and more importantly; the code behaves as expected.
 
 ```shell
-# Run PHPUnit:
+# Run PHP CodeSniffer
+docker compose exec php-8.3 vendor/bin/phpcs example src tests --standard=PSR12
+```
+
+```shell
+# Run PHPStan
+docker compose exec php-8.3 vendor/bin/phpstan analyse example src tests --level=9
+```
+
+```shell
+# Run PHPUnit
 docker compose exec php-8.3 vendor/bin/phpunit
 ```
 
