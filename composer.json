@@ -1,7 +1,7 @@
 {
   "name": "twanhaverkamp/event-sourcing-with-php",
   "description": "Event Sourcing with PHP",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "library",
   "license": "MIT",
   "authors": [
