@@ -8,7 +8,7 @@ use TwanHaverkamp\EventSourcingWithPhp\Event\Exception;
 interface EventStoreInterface
 {
     /**
-     * @throws Exception\EventStorageFailedException
+     * @throws Exception\EventRetrievalFailedException
      */
     public function load(AggregateInterface $aggregate): void;
 
