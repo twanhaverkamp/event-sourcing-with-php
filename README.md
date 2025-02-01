@@ -3,6 +3,7 @@
 **Table of Contents**
 
 - [What problem does Event Sourcing solve for you?](#what-problem-does-event-sourcing-solve-for-you)
+    - [Compare data structures](#compare-data-structures)
     - [Drawbacks](#drawbacks)
     - [Considerations](#considerations)
 
@@ -33,19 +34,46 @@ You not only want to know what the current state of an object is, but you also w
 *how* the object got in this state? In that case Event Sourcing might be the solution
 to your problem!
 
+### Compare data structures
+
+**CRUD with relations:**
+
+| ID | Number | Subtotal | Tax  | Total | CreatedAt  | PaymentDueAt |
+|----|--------|----------|------|-------|------------|--------------|
+| 1  | 12-34  | 22.80    | 3.75 | 16.55 | 2025-02-01 | 2025-03-01   |
+
+| ID | Invoice ID | Reference    | Description | Quantity | Price | Tax   |
+|----|------------|--------------|-------------|----------|-------|-------|
+| 1  | 1          | prod.123.456 | Product     | 3        | 5.95  | 21.00 |
+| 2  | 1          |              | Shipping    | 1        | 4.95  | 0.00  |
+
+| ID | Invoice ID | PaymentMethod | Amount | Status    |
+|----|------------|---------------|--------|-----------|
+| 1  | 1          | Manual        | 10.00  | Completed |
+
+**Event sourced:**
+
+| AggregateRootId            | Event                             | Payload                               | RecordedAt |
+|----------------------------|-----------------------------------|---------------------------------------|------------|
+| 01941d8f-9951-72af-b5ce... | invoice-was-created               | {"number": "12-34", "items": [...]    | 2025-02-01 | 
+| 01941d8f-9951-72af-b5ce... | payment-transaction-was-started   | {"method": "Manual", "amount": 10.00} | 2025-02-01 |
+| 01941d8f-9951-72af-b5ce... | payment-transaction-was-completed | {}                                    | 2025-02-01 |
+
+Your read models can, of course, still be stored in relational tables as illustrated above,
+but your Aggregate will be built based on the stored Events.
+
 ### Drawbacks
 While Event Sourcing may solve problems, it also brings some challenges with it:
 
 - Learning curve; *When shifting from CRUD to Event Sourcing, you may experience a steep learning curve.*
 - Potentially slow; *Especially when your aggregate has a long life cycle.*
 
-<a href="#considerations"></a>
 ### Considerations
 Since this is supposed to be a *lightweight* library you will have to come up (for now) with a solution
 for the following:
 
 - [ ] Snapshots; *Cache your aggregate with a "Snapshot event" to reduce loading time.*
-- [ ] Projections; *When you're working with relational databases.*
+- [ ] Projections; *For working with read models.*
 - [ ] Anonymize; *Protect (privacy) sensitive data.*
 
 > Yes, I'm planning to implement these features **soon™**, but until then it's up to you. 😅
