@@ -53,11 +53,11 @@ to your problem!
 
 **Event sourced:**
 
-| AggregateRootId            | Event                             | Payload                               | RecordedAt |
-|----------------------------|-----------------------------------|---------------------------------------|------------|
-| 01941d8f-9951-72af-b5ce... | invoice-was-created               | {"number": "12-34", "items": [...]    | 2025-02-01 | 
-| 01941d8f-9951-72af-b5ce... | payment-transaction-was-started   | {"method": "Manual", "amount": 10.00} | 2025-02-01 |
-| 01941d8f-9951-72af-b5ce... | payment-transaction-was-completed | {}                                    | 2025-02-01 |
+| AggregateRootId | Event                             | Payload                             | RecordedAt |
+|-----------------|-----------------------------------|-------------------------------------|------------|
+| 01941d8f-995... | invoice-was-created               | {"number": "12-34", "items": [...]} | 2025-02-01 | 
+| 01941d8f-995... | payment-transaction-was-started   | {[...]}                             | 2025-02-01 |
+| 01941d8f-995... | payment-transaction-was-completed | {}                                  | 2025-02-01 |
 
 Your read models can, of course, still be stored in relational tables as illustrated above,
 but your Aggregate will be built based on the stored Events.
