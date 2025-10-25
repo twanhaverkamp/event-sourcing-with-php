@@ -38,6 +38,7 @@ class KebabCaseTest extends TestCase
         $this->expectExceptionMessage('The passed Event \'invalid-class-string\' could not be described.');
 
         (new EventDescriber\KebabCase())
+            /** @phpstan-ignore argument.type */
             ->describe('invalid-class-string');
     }
 
