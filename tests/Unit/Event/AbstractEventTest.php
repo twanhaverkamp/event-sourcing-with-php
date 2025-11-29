@@ -17,7 +17,7 @@ class AbstractEventTest extends TestCase
     #[Attributes\TestDox('Assert that \'getAggregateRootId\' returns the constructed AggregateRootId')]
     public function getAggregateRootIdReturnsConstructedValue(): void
     {
-        $aggregateRootId = self::createStub(AggregateRootId\AggregateRootIdInterface::class);
+        $aggregateRootId = static::createStub(AggregateRootId\AggregateRootIdInterface::class);
 
         foreach (EventFaker::getEvents($aggregateRootId) as $event) {
             static::assertSame($aggregateRootId, $event->getAggregateRootId());
@@ -28,7 +28,7 @@ class AbstractEventTest extends TestCase
     #[Attributes\TestDox('Assert that \'getRecordedAt\' returns the constructed DateTimeInterface')]
     public function getRecordedAtReturnsConstructedValue(): void
     {
-        $aggregateRootId = self::createStub(AggregateRootId\AggregateRootIdInterface::class);
+        $aggregateRootId = static::createStub(AggregateRootId\AggregateRootIdInterface::class);
         $recordedAt = new DateTimeImmutable();
 
         foreach (EventFaker::getEvents($aggregateRootId, $recordedAt) as $event) {

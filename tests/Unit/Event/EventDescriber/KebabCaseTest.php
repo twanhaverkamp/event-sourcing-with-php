@@ -50,7 +50,7 @@ class KebabCaseTest extends TestCase
      */
     public static function getEventsWithExpectedString(): array
     {
-        $aggregateRootId = self::createStub(AggregateRootId\AggregateRootIdInterface::class);
+        $aggregateRootId = static::createStub(AggregateRootId\AggregateRootIdInterface::class);
 
         return [
             'InvoiceWasCreated class, expects \'invoice-was-created\'' => [
