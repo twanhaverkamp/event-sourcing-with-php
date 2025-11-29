@@ -52,6 +52,7 @@ jobs:
         env:
           XDEBUG_MODE: coverage
         with:
+          php_version: '8.3'
           php_extensions: xdebug
           testsuite: unit
           args: --testdox --coverage-text
