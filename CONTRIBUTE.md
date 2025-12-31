@@ -36,7 +36,7 @@ docker compose up -d
 If you want to get into the project's PHP container, run the following command:
 
 ```shell
-docker compose exec -it php-8.3 sh
+docker compose exec -it php-8.4 sh
 ```
 
 > This requires you to have [Docker](https://www.docker.com/) installed on your computer. Personally I'm using
@@ -49,17 +49,17 @@ to make sure code quality won't decrease and more importantly; the code behaves 
 
 ```shell
 # Run PHP CodeSniffer
-docker compose exec php-8.3 vendor/bin/phpcs example src tests --standard=PSR12
+docker compose exec php-8.4 vendor/bin/phpcs example src tests --standard=PSR12
 ```
 
 ```shell
 # Run PHPStan
-docker compose exec php-8.3 vendor/bin/phpstan analyse example src tests --level=9
+docker compose exec php-8.4 vendor/bin/phpstan analyse example src tests --level=9
 ```
 
 ```shell
 # Run PHPUnit
-docker compose exec php-8.3 vendor/bin/phpunit
+docker compose exec php-8.4 vendor/bin/phpunit
 ```
 
 ## Pull request

@@ -41,7 +41,7 @@ class Uuid7Test extends TestCase
     #[Attributes\TestDox('Assert that \'toString\' returns a valid UUID v7 string')]
     public function toStringReturnsUuidString(): void
     {
-        $aggregateRootId = (new AggregateRootId\Uuid7())->toString();
+        $aggregateRootId = new AggregateRootId\Uuid7()->toString();
 
         static::assertTrue(RamseyUuid::isValid($aggregateRootId));
     }

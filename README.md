@@ -103,12 +103,12 @@ in ascending order. Each Event will be applied to the Aggregate, which eventuall
 ### Installation
 
 **Requirements:**
-- PHP 8.3 (or higher)
+- PHP 8.4 (or higher)
 
 If you're using [Composer](https://getcomposer.org/) in your project you can run the following command:
 
 ```shell
-composer require twanhaverkamp/event-sourcing-with-php:^1.0 
+composer require twanhaverkamp/event-sourcing-with-php:^2.0 
 ```
 
 ### Implementation
