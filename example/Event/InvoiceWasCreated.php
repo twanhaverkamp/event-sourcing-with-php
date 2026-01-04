@@ -27,14 +27,12 @@ readonly class InvoiceWasCreated extends Event\AbstractEvent
      * @param array{
      *     number: string,
      *     items: array{
-     *         array{
-     *             reference: string|null,
-     *             description: string,
-     *             quantity: int,
-     *             price: float,
-     *             tax: float,
-     *         },
-     *     },
+     *         reference: string|null,
+     *         description: string,
+     *         quantity: int,
+     *         price: float,
+     *         tax: float,
+     *     }[],
      * } $payload
      */
     public static function fromPayload(
