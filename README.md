@@ -96,7 +96,8 @@ directly from your storage you query it's related Events with the AggregateRootI
 in ascending order. Each Event will be applied to the Aggregate, which eventually will get in it's expected state.
 
 **Available:**
-- [Redis](https://github.com/twanhaverkamp/event-storage-in-redis-with-php) _(not recommended)_
+- [MongoDB](https://github.com/twanhaverkamp/event-storage-in-mongodb-with-php)
+- [Redis](https://github.com/twanhaverkamp/event-storage-in-redis-with-php)
 
 ## Usage
 
